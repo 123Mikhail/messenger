@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageMapper {
     public MessageDto toDto(Message message) {
-        if (message == null) return null;
+        if (message == null) {
+            return null;
+        }
         MessageDto dto = new MessageDto();
         dto.setId(message.getId());
         dto.setSender(message.getSender());
