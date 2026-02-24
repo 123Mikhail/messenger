@@ -1,54 +1,43 @@
-Messenger Application
-Description
-Spring Boot REST-приложение для обмена сообщениями. Данный проект является учебным и будет расширяться в рамках последующих лабораторных работ.
-+1
+# Messenger
 
-Features (Lab 1)
-REST API для сущности "Сообщение" (Message).
+## Description
 
-Получение сообщения по ID с использованием @PathVariable.
+Spring Boot REST application for real-time messaging between connected users.
 
-Поиск сообщений по отправителю с использованием @RequestParam.
+The project is created as part of laboratory work and will be extended step by step with new features and improvements.
 
-Создание нового сообщения через POST-запрос.
+## Features (Lab 1)
 
+* REST API for User entity
+* GET user by ID
+* GET user by username
+* Create new user (registration)
+* DTO + Mapper for user data transformation
+* Layered architecture (Controller → Service → Repository)
+* Code style validation with Checkstyle
+* In-memory H2 database for prototyping
 
-Разделение на слои: реализована архитектура Controller → Service → Repository.
-+2
+## Tech Stack
 
+* Java 17
+* Spring Boot 3.x
+* Spring Web MVC
+* Spring Data JPA
+* H2 Database
+* Lombok
+* MapStruct (or manual mapper)
+* Maven
+* Checkstyle
 
-DTO и Mapper: реализовано преобразование между внутренними сущностями и объектами ответа API.
-+2
+## How to run
 
+```bash
+# Clone the repository
+git clone https://github.com/your-username/messenger.git
+cd messenger
 
-Checkstyle: код проверен на соответствие Google Java Style.
-+1
-
-How to run
-Для запуска приложения используйте команду Maven:
-
-Bash
+# Run the application
 mvn spring-boot:run
-Приложение будет доступно по адресу: http://localhost:8080.
 
-H2 Console
-В проекте используется база данных H2 в памяти. Консоль управления доступна по адресу:
-
-http://localhost:8080/h2-console
-Future work
-В следующих этапах планируется реализация:
-
-Связи JPA: реализация отношений OneToMany и ManyToMany между пользователями и чатами.
-
-Кэширование: внедрение механизмов кэширования данных.
-
-Логирование и валидация: настройка сквозного логирования и обработки ошибок.
-
-Тестирование: покрытие кода Unit-тестами.
-
-Concurrency: работа с многопоточностью и асинхронными операциями.
-* Concurrency
-* Client
-* Docker deployment
 
 * https://sonarcloud.io/project/overview?id=123Mikhail_messenger
