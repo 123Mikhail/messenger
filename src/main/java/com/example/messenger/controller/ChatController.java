@@ -26,9 +26,13 @@ public class ChatController {
     }
 
     @PutMapping("/{chatId}/members")
-    public String addMember(@PathVariable Long chatId, @RequestParam String username) {
+    public ResponseEntity<String> addMember(
+            @PathVariable Long chatId,
+            @RequestParam String username) {
+
         chatService.addUserToChat(chatId, username);
-        return "Пользователь " + username + " успешно добавлен в чат " + chatId;
+        // Безопасный ответ без передачи пользовательского ввода напрямую:
+        return ResponseEntity.ok("Пользователь успешно добавлен в чат " + chatId);
     }
 
     @GetMapping("/{chatId}/subchats")
