@@ -6,23 +6,33 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MessageMapper {
+
     public MessageDto toDto(Message message) {
         if (message == null) {
             return null;
         }
         MessageDto dto = new MessageDto();
         dto.setId(message.getId());
-        dto.setSender(message.getSender());
+
+        if (message.getUser() != null) {
+            dto.setSender(message.getUser().getUsername());
+        }
+        // Достаем ID чата
+        if (message.getChat() != null) {
+            dto.setChatId(message.getChat().getId());
+        }
+
         dto.setContent(message.getContent());
         dto.setTimestamp(message.getTimestamp());
         return dto;
     }
 
     public Message toEntity(MessageDto dto) {
-        if (dto == null) return null;
+        if (dto == null) {
+            return null;
+        }
         return Message.builder()
                 .id(dto.getId())
-                .sender(dto.getSender())
                 .content(dto.getContent())
                 .timestamp(dto.getTimestamp())
                 .build();
