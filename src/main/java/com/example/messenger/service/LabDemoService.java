@@ -27,24 +27,20 @@ public class LabDemoService {
         userRepository.save(user); // Сохранится успешно
 
         // Имитируем непредвиденную ошибку сервера
-        if (true) throw new RuntimeException("Искусственная ошибка во время сохранения!");
+        if (true) throw new IllegalArgumentException("Искусственная ошибка во время сохранения!");
 
         Chat chat = Chat.builder().title("Секретный чат").createdAt(LocalDateTime.now()).build();
         chatRepository.save(chat); // До сюда код не дойдет
     }
 
-    /**
-     * ДЕМОНСТРАЦИЯ ДЛЯ ЗАЩИТЫ (С транзакцией)
-     * Благодаря @Transactional, из-за ошибки в середине метода,
-     * база данных сделает ROLLBACK. User не появится в БД. База останется целостной.
-     */
+
     @Transactional
     public void saveDataWithTransaction() {
         User user = User.builder().username("hacker_with_tx").email("safe@mail.com").build();
         userRepository.save(user);
 
         // Имитируем ошибку
-        if (true) throw new RuntimeException("Ошибка, но транзакция всё откатит!");
+        if (true) throw new IllegalArgumentException("Ошибка, но транзакция всё откатит!");
 
         Chat chat = Chat.builder().title("Транзакционный чат").createdAt(LocalDateTime.now()).build();
         chatRepository.save(chat);

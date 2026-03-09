@@ -39,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
 
         // 3. ПРОВЕРКА БЕЗОПАСНОСТИ: Состоит ли пользователь в этом чате?
         if (!chat.getMembers().contains(user)) {
-            throw new RuntimeException("Отказано в доступе: Пользователь " + user.getUsername() +
+            throw new IllegalArgumentException("Отказано в доступе: Пользователь " + user.getUsername() +
                     " не состоит в чате с ID " + chat.getId());
         }
 
