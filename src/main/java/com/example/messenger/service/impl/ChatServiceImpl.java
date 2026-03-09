@@ -45,7 +45,7 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public void addUserToChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new RuntimeException("Чат не найден"));
+                .orElseThrow(() -> new IllegalArgumentException("Чат не найден"));
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
