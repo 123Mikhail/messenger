@@ -15,6 +15,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
+    // Выносим повторяющиеся строки в константы для SonarCloud
+    private static final String CHAT_NOT_FOUND = "Чат не найден";
+    private static final String USER_NOT_FOUND = "Пользователь не найден";
+
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
 
@@ -23,7 +27,7 @@ public class ChatServiceImpl implements ChatService {
     public Chat createChat(String title, List<String> usernames, Long parentId) {
         List<User> members = usernames.stream()
                 .map(name -> userRepository.findByUsername(name)
-                        .orElseThrow(() -> new RuntimeException("Пользователь " + name + " не найден")))
+                        .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND + ": " + name)))
                 .toList();
 
         Chat chat = Chat.builder()
@@ -34,7 +38,7 @@ public class ChatServiceImpl implements ChatService {
 
         if (parentId != null) {
             Chat parent = chatRepository.findById(parentId)
-                    .orElseThrow(() -> new RuntimeException("Родительский чат не найден"));
+                    .orElseThrow(() -> new IllegalArgumentException("Родительский чат не найден"));
             chat.setParentChat(parent);
         }
 
@@ -45,10 +49,10 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public void addUserToChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new IllegalArgumentException("Чат не найден"));
+                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND));
 
         if (!chat.getMembers().contains(user)) {
             chat.getMembers().add(user);
@@ -59,7 +63,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<Chat> getSubChats(Long parentId) {
         Chat parent = chatRepository.findById(parentId)
-                .orElseThrow(() -> new RuntimeException("Чат не найден"));
+                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
         return parent.getSubChats();
     }
 
@@ -68,31 +72,27 @@ public class ChatServiceImpl implements ChatService {
         return chatRepository.findById(id).orElse(null);
     }
 
-    // НОВЫЙ МЕТОД: Удаление пользователя из чата
     @Override
     @Transactional
     public void removeUserFromChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new IllegalArgumentException("Чат не найден"));
+                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+                .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND));
 
         if (chat.getMembers().contains(user)) {
             chat.getMembers().remove(user);
-            chatRepository.save(chat); // Hibernate автоматически удалит связь из таблицы chat_members
+            chatRepository.save(chat);
         }
     }
 
-    // НОВЫЙ МЕТОД: Удаление самого чата (и всех его подчатов)
     @Override
     @Transactional
     public void deleteChat(Long chatId) {
         Chat chat = chatRepository.findById(chatId)
-                .orElseThrow(() -> new RuntimeException("Чат не найден"));
+                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
 
-        // Благодаря CascadeType.ALL в сущности Chat, удаление этого объекта
-        // приведет к удалению всех связанных сообщений и подчатов из БД.
         chatRepository.delete(chat);
     }
 }
