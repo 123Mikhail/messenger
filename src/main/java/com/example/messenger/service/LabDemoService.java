@@ -5,11 +5,13 @@ import com.example.messenger.domain.model.User;
 import com.example.messenger.repository.ChatRepository;
 import com.example.messenger.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j // НОВАЯ АННОТАЦИЯ ДЛЯ ЛОГИРОВАНИЯ
 @Service
 @RequiredArgsConstructor
 public class LabDemoService {
@@ -50,29 +52,29 @@ public class LabDemoService {
 
     @Transactional(readOnly = true)
     public void demonstrateNPlusOneProblem() {
-        System.out.println("========== ПРОБЛЕМА N+1 (НАЧАЛО) ==========");
+        log.info("========== ПРОБЛЕМА N+1 (НАЧАЛО) ==========");
         // 1 запрос достает все чаты
         List<Chat> chats = chatRepository.findAll();
 
         for (Chat chat : chats) {
             // N запросов: для каждого чата Hibernate делает отдельный SELECT в таблицу messages
             int messagesCount = chat.getMessages().size();
-            System.out.println("Чат " + chat.getId() + " содержит " + messagesCount + " сообщений");
+            log.info("Чат {} содержит {} сообщений", chat.getId(), messagesCount);
         }
-        System.out.println("========== ПРОБЛЕМА N+1 (КОНЕЦ) ==========");
+        log.info("========== ПРОБЛЕМА N+1 (КОНЕЦ) ==========");
     }
 
     @Transactional(readOnly = true)
     public void demonstrateNPlusOneSolution() {
-        System.out.println("========== РЕШЕНИЕ N+1 (НАЧАЛО) ==========");
+        log.info("========== РЕШЕНИЕ N+1 (НАЧАЛО) ==========");
         // Всего 1 запрос достает ВСЁ: и чаты, и их сообщения через JOIN благодаря @EntityGraph
         List<Chat> chats = chatRepository.findAllWithMessages();
 
         for (Chat chat : chats) {
             // Запросов к БД больше нет, данные уже в оперативной памяти
             int messagesCount = chat.getMessages().size();
-            System.out.println("Чат " + chat.getId() + " содержит " + messagesCount + " сообщений");
+            log.info("Чат {} содержит {} сообщений", chat.getId(), messagesCount);
         }
-        System.out.println("========== РЕШЕНИЕ N+1 (КОНЕЦ) ==========");
+        log.info("========== РЕШЕНИЕ N+1 (КОНЕЦ) ==========");
     }
 }
