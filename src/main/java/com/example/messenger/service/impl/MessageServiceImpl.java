@@ -28,22 +28,15 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public MessageDto save(MessageDto dto) {
         Message entity = mapper.toEntity(dto);
-
-        // 1. Находим отправителя
         User user = userRepository.findByUsername(dto.getSender())
-                .orElseThrow(() -> new RuntimeException("User not found: " + dto.getSender()));
-
-        // 2. Находим чат (диалог)
+                .orElseThrow(() -> new IllegalArgumentException("Отправитель не найден: " + dto.getSender()));
         Chat chat = chatRepository.findById(dto.getChatId())
-                .orElseThrow(() -> new RuntimeException("Chat not found: " + dto.getChatId()));
+                .orElseThrow(() -> new IllegalArgumentException("Чат не найден: " + dto.getChatId()));
 
-        // 3. ПРОВЕРКА БЕЗОПАСНОСТИ: Состоит ли пользователь в этом чате?
         if (!chat.getMembers().contains(user)) {
-            throw new IllegalArgumentException("Отказано в доступе: Пользователь " + user.getUsername() +
-                    " не состоит в чате с ID " + chat.getId());
+            throw new IllegalStateException("Отказано в доступе: Пользователь не состоит в чате");
         }
 
-        // 4. Привязываем сообщение и к юзеру, и к чату
         entity.setUser(user);
         entity.setChat(chat);
         entity.setTimestamp(LocalDateTime.now());
@@ -58,8 +51,27 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageDto> getBySender(String sender) {
-        return repository.findByUserUsername(sender).stream()
-                .map(mapper::toDto)
-                .toList();
+        return repository.findByUserUsername(sender).stream().map(mapper::toDto).toList();
+    }
+
+    // --- НОВЫЕ МЕТОДЫ ДЛЯ ЧТЕНИЯ И ОБНОВЛЕНИЯ ---
+
+    @Override
+    public List<MessageDto> getByChatId(Long chatId) {
+        return repository.findByChatId(chatId).stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    public List<MessageDto> getAll() {
+        return repository.findAll().stream().map(mapper::toDto).toList();
+    }
+
+    @Override
+    @Transactional
+    public MessageDto updateMessage(Long id, String newContent) {
+        Message message = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
+        message.setContent(newContent);
+        return mapper.toDto(repository.save(message));
     }
 }

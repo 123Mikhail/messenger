@@ -8,8 +8,9 @@ public interface ChatService {
     void addUserToChat(Long chatId, String username);
     List<Chat> getSubChats(Long parentId);
     Chat getById(Long id);
-
-    // НОВЫЕ МЕТОДЫ ДЛЯ УДАЛЕНИЯ
     void removeUserFromChat(Long chatId, String username);
     void deleteChat(Long chatId);
+
+    // НОВЫЙ МЕТОД
+    Chat updateChatTitle(Long chatId, String newTitle);
 }

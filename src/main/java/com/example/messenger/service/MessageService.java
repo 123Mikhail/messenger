@@ -7,4 +7,9 @@ public interface MessageService {
     MessageDto save(MessageDto dto);
     MessageDto getById(Long id);
     List<MessageDto> getBySender(String sender);
+
+    // НОВЫЕ МЕТОДЫ:
+    List<MessageDto> getByChatId(Long chatId);
+    List<MessageDto> getAll();
+    MessageDto updateMessage(Long id, String newContent);
 }

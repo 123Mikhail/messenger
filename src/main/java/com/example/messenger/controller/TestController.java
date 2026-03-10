@@ -11,31 +11,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TestController {
 
-    private final LabDemoService demoService;
+    private final LabDemoService labDemoService;
 
-    // Тест 1: Без транзакции (Демонстрация проблемы)
-    @GetMapping("/no-tx")
-    public String testWithoutTransaction() {
+    @GetMapping("/without-tx")
+    public String testWithoutTx() {
         try {
-            demoService.saveDataWithoutTransaction();
+            labDemoService.saveDataWithoutTransaction();
         } catch (Exception e) {
-            return "ОШИБКА ПОЙМАНА! <br> Зайди в pgAdmin в таблицу 'users'. " +
-                    "Пользователь 'hacker_no_tx' сохранился, хотя процесс прервался ошибкой. " +
-                    "База данных загрязнена частичными данными.";
+            return "Без @Transactional. Исключение: " + e.getMessage() + " Проверьте БД (юзер hacker_no_tx сохранился).";
         }
         return "Успех";
     }
 
-    // Тест 2: С транзакцией (Правильное решение)
     @GetMapping("/with-tx")
-    public String testWithTransaction() {
+    public String testWithTx() {
         try {
-            demoService.saveDataWithTransaction();
+            labDemoService.saveDataWithTransaction();
         } catch (Exception e) {
-            return "ОШИБКА ПОЙМАНА! <br> Зайди в pgAdmin в таблицу 'users'. " +
-                    "Пользователя 'hacker_with_tx' ТАМ НЕТ. " +
-                    "@Transactional успешно отменил (ROLLBACK) операцию сохранения юзера из-за ошибки!";
+            return "С @Transactional. Исключение: " + e.getMessage() + " Проверьте БД (ROLLBACK: юзер hacker_with_tx НЕ сохранился).";
         }
         return "Успех";
+    }
+
+    @GetMapping("/n-plus-one-problem")
+    public String nPlusOneProblem() {
+        labDemoService.demonstrateNPlusOneProblem();
+        return "Проблема N+1 отработала. Посмотри статистику (JDBC statements executed) в консоли IntelliJ IDEA!";
+    }
+
+    @GetMapping("/n-plus-one-solution")
+    public String nPlusOneSolution() {
+        labDemoService.demonstrateNPlusOneSolution();
+        return "Решение N+1 отработало. Посмотри статистику (JDBC statements executed) в консоли IntelliJ IDEA!";
     }
 }

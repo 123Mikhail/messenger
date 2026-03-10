@@ -4,13 +4,14 @@ import com.example.messenger.domain.model.Chat;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
+@Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    // РЕШЕНИЕ ПРОБЛЕМЫ N+1 (Требование №5)
-    // EntityGraph заставляет Hibernate сразу загрузить коллекцию members одним SQL-запросом
-    @EntityGraph(attributePaths = {"members"})
+    // РЕШЕНИЕ ПРОБЛЕМЫ N+1
+    @EntityGraph(attributePaths = {"messages"})
     @Query("SELECT c FROM Chat c")
-    List<Chat> findAllWithMembers();
+    List<Chat> findAllWithMessages();
 }

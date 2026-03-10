@@ -1,6 +1,5 @@
 package com.example.messenger.controller;
 
-import com.example.messenger.domain.model.Chat;
 import com.example.messenger.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,44 +14,45 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping
-    public String createChat(
+    public ResponseEntity<String> createChat(
             @RequestParam String title,
             @RequestParam List<String> usernames,
             @RequestParam(required = false) Long parentId) {
-
-        Chat chat = chatService.createChat(title, usernames, parentId);
+        var chat = chatService.createChat(title, usernames, parentId);
         String prefix = (parentId != null) ? "Подчат" : "Чат";
-        return prefix + " успешно создан! ID: " + chat.getId();
+        return ResponseEntity.ok(prefix + " успешно создан! ID: " + chat.getId());
     }
 
     @PutMapping("/{chatId}/members")
-    public ResponseEntity<String> addMember(
-            @PathVariable Long chatId,
-            @RequestParam String username) {
-
+    public ResponseEntity<String> addMember(@PathVariable Long chatId, @RequestParam String username) {
         chatService.addUserToChat(chatId, username);
-        // Безопасный ответ без передачи пользовательского ввода напрямую:
         return ResponseEntity.ok("Пользователь успешно добавлен в чат " + chatId);
     }
 
-    @GetMapping("/{chatId}/subchats")
-    public List<String> getSubChats(@PathVariable Long chatId) {
-        return chatService.getSubChats(chatId).stream()
-                .map(Chat::getTitle)
-                .toList();
+    // НОВЫЙ ЭНДПОИНТ: Изменить название чата
+    @PutMapping("/{chatId}")
+    public ResponseEntity<String> updateChatTitle(@PathVariable Long chatId, @RequestParam String newTitle) {
+        chatService.updateChatTitle(chatId, newTitle);
+        return ResponseEntity.ok("Название чата успешно изменено на: " + newTitle);
     }
 
-    // НОВЫЙ ЭНДПОИНТ: Удалить пользователя из чата
+    @GetMapping("/{chatId}/subchats")
+    public ResponseEntity<List<String>> getSubChats(@PathVariable Long chatId) {
+        List<String> subChats = chatService.getSubChats(chatId).stream()
+                .map(chat -> chat.getTitle())
+                .toList();
+        return ResponseEntity.ok(subChats);
+    }
+
     @DeleteMapping("/{chatId}/members")
     public ResponseEntity<Void> removeMember(@PathVariable Long chatId, @RequestParam String username) {
         chatService.removeUserFromChat(chatId, username);
-        return ResponseEntity.noContent().build(); // Возвращает статус 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
-    // НОВЫЙ ЭНДПОИНТ: Удалить чат (или подчат)
     @DeleteMapping("/{chatId}")
     public ResponseEntity<Void> deleteChat(@PathVariable Long chatId) {
         chatService.deleteChat(chatId);
-        return ResponseEntity.noContent().build(); // Возвращает статус 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }

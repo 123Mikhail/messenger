@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
-    // Выносим повторяющиеся строки в константы для SonarCloud
     private static final String CHAT_NOT_FOUND = "Чат не найден";
     private static final String USER_NOT_FOUND = "Пользователь не найден";
 
@@ -41,7 +40,6 @@ public class ChatServiceImpl implements ChatService {
                     .orElseThrow(() -> new IllegalArgumentException("Родительский чат не найден"));
             chat.setParentChat(parent);
         }
-
         return chatRepository.save(chat);
     }
 
@@ -50,7 +48,6 @@ public class ChatServiceImpl implements ChatService {
     public void addUserToChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
-
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND));
 
@@ -77,7 +74,6 @@ public class ChatServiceImpl implements ChatService {
     public void removeUserFromChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
-
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND));
 
@@ -92,7 +88,16 @@ public class ChatServiceImpl implements ChatService {
     public void deleteChat(Long chatId) {
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
-
         chatRepository.delete(chat);
+    }
+
+    // НОВЫЙ МЕТОД: Изменение названия чата
+    @Override
+    @Transactional
+    public Chat updateChatTitle(Long chatId, String newTitle) {
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
+        chat.setTitle(newTitle);
+        return chatRepository.save(chat);
     }
 }
