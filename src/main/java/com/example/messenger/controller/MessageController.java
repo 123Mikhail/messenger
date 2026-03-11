@@ -24,7 +24,6 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getById(id));
     }
 
-    // Универсальный GET-метод: возвращает все сообщения, либо фильтрует по отправителю/чату
     @GetMapping
     public ResponseEntity<List<MessageDto>> getMessages(
             @RequestParam(required = false) String sender,
@@ -38,11 +37,16 @@ public class MessageController {
         return ResponseEntity.ok(messageService.getAll());
     }
 
-    // НОВЫЙ ЭНДПОИНТ: Изменить текст сообщения
     @PutMapping("/{id}")
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable Long id,
             @RequestParam String newContent) {
         return ResponseEntity.ok(messageService.updateMessage(id, newContent));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
+        messageService.deleteMessage(id);
+        return ResponseEntity.noContent().build();
     }
 }

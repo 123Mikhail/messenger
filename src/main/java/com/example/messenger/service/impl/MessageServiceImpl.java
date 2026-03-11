@@ -54,8 +54,6 @@ public class MessageServiceImpl implements MessageService {
         return repository.findByUserUsername(sender).stream().map(mapper::toDto).toList();
     }
 
-    // --- НОВЫЕ МЕТОДЫ ДЛЯ ЧТЕНИЯ И ОБНОВЛЕНИЯ ---
-
     @Override
     public List<MessageDto> getByChatId(Long chatId) {
         return repository.findByChatId(chatId).stream().map(mapper::toDto).toList();
@@ -73,5 +71,13 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
         message.setContent(newContent);
         return mapper.toDto(repository.save(message));
+    }
+
+    @Override
+    @Transactional
+    public void deleteMessage(Long id) {
+        Message message = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
+        repository.delete(message);
     }
 }

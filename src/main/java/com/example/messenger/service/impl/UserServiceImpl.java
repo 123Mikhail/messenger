@@ -15,11 +15,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
     public User updateUsername(Long userId, String newUsername) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
         user.setUsername(newUsername);
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        userRepository.delete(user);
     }
 }
