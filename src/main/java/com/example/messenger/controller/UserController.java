@@ -1,5 +1,6 @@
 package com.example.messenger.controller;
 
+import com.example.messenger.domain.dto.UserDto;
 import com.example.messenger.domain.model.User;
 import com.example.messenger.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,13 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@RequestBody UserDto userDto) {
+        // Перекладываем разрешенные данные из DTO в сущность БД
+        User user = User.builder()
+                .username(userDto.getUsername())
+                .email(userDto.getEmail())
+                .build();
+
         return ResponseEntity.ok(userService.createUser(user));
     }
 
