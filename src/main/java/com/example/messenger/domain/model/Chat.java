@@ -1,27 +1,32 @@
 package com.example.messenger.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "chats")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Chat {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // ManyToMany: Участники чата
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "chat_members",
@@ -30,17 +35,16 @@ public class Chat {
     )
     private List<User> members = new ArrayList<>();
 
-    // OneToMany: Сообщения в этом чате
+    @JsonIgnore
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
-    // СВЯЗЬ ДЛЯ ПОДЧАТОВ (Self-referencing OneToMany)
-    // Указывает на "родительский" чат
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Chat parentChat;
 
-    // Список "дочерних" подчатов
+    @JsonIgnore
     @OneToMany(mappedBy = "parentChat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Chat> subChats = new ArrayList<>();
 }
