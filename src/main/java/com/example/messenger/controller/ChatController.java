@@ -1,5 +1,6 @@
 package com.example.messenger.controller;
 
+import com.example.messenger.domain.model.Chat;
 import com.example.messenger.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,19 +30,10 @@ public class ChatController {
         return ResponseEntity.ok("Пользователь успешно добавлен в чат " + chatId);
     }
 
-    // НОВЫЙ ЭНДПОИНТ: Изменить название чата
     @PutMapping("/{chatId}")
     public ResponseEntity<String> updateChatTitle(@PathVariable Long chatId, @RequestParam String newTitle) {
         chatService.updateChatTitle(chatId, newTitle);
         return ResponseEntity.ok("Название чата успешно изменено на: " + newTitle);
-    }
-
-    @GetMapping("/{chatId}/subchats")
-    public ResponseEntity<List<String>> getSubChats(@PathVariable Long chatId) {
-        List<String> subChats = chatService.getSubChats(chatId).stream()
-                .map(chat -> chat.getTitle())
-                .toList();
-        return ResponseEntity.ok(subChats);
     }
 
     @DeleteMapping("/{chatId}/members")
@@ -54,5 +46,26 @@ public class ChatController {
     public ResponseEntity<Void> deleteChat(@PathVariable Long chatId) {
         chatService.deleteChat(chatId);
         return ResponseEntity.noContent().build();
+    }
+
+    // --- НОВЫЕ ЭНДПОИНТЫ ДЛЯ ПОЛУЧЕНИЯ ЧАТОВ ---
+
+    @GetMapping
+    public ResponseEntity<List<Chat>> getAllChats() {
+        return ResponseEntity.ok(chatService.getAllChats());
+    }
+
+    @GetMapping("/{chatId}")
+    public ResponseEntity<Chat> getChatById(@PathVariable Long chatId) {
+        Chat chat = chatService.getById(chatId);
+        return chat != null ? ResponseEntity.ok(chat) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{chatId}/subchats")
+    public ResponseEntity<List<String>> getSubChats(@PathVariable Long chatId) {
+        List<String> subChats = chatService.getSubChats(chatId).stream()
+                .map(chat -> chat.getTitle())
+                .toList();
+        return ResponseEntity.ok(subChats);
     }
 }

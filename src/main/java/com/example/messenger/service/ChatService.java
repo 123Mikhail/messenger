@@ -7,10 +7,11 @@ public interface ChatService {
     Chat createChat(String title, List<String> usernames, Long parentId);
     void addUserToChat(Long chatId, String username);
     List<Chat> getSubChats(Long parentId);
-    Chat getById(Long id);
     void removeUserFromChat(Long chatId, String username);
     void deleteChat(Long chatId);
-
-    // НОВЫЙ МЕТОД
     Chat updateChatTitle(Long chatId, String newTitle);
+
+    // НОВЫЕ МЕТОДЫ: Получение чатов
+    Chat getById(Long id);
+    List<Chat> getAllChats();
 }

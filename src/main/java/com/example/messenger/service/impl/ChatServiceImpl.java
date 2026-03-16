@@ -58,18 +58,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<Chat> getSubChats(Long parentId) {
-        Chat parent = chatRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
-        return parent.getSubChats();
-    }
-
-    @Override
-    public Chat getById(Long id) {
-        return chatRepository.findById(id).orElse(null);
-    }
-
-    @Override
     @Transactional
     public void removeUserFromChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId)
@@ -91,7 +79,6 @@ public class ChatServiceImpl implements ChatService {
         chatRepository.delete(chat);
     }
 
-    // НОВЫЙ МЕТОД: Изменение названия чата
     @Override
     @Transactional
     public Chat updateChatTitle(Long chatId, String newTitle) {
@@ -99,5 +86,24 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
         chat.setTitle(newTitle);
         return chatRepository.save(chat);
+    }
+
+    // --- НОВЫЕ МЕТОДЫ И ЧТЕНИЕ ДАННЫХ ---
+
+    @Override
+    public List<Chat> getSubChats(Long parentId) {
+        Chat parent = chatRepository.findById(parentId)
+                .orElseThrow(() -> new IllegalArgumentException(CHAT_NOT_FOUND));
+        return parent.getSubChats();
+    }
+
+    @Override
+    public Chat getById(Long id) {
+        return chatRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Chat> getAllChats() {
+        return chatRepository.findAll();
     }
 }
