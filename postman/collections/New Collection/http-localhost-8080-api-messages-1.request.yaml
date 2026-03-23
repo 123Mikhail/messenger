@@ -1,0 +1,5 @@
+$kind: http-request
+name: http://localhost:8080/api/messages/1
+url: http://localhost:8080/api/messages/1
+method: GET
+order: 1772657906548
