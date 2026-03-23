@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j // НОВАЯ АННОТАЦИЯ ДЛЯ ЛОГИРОВАНИЯ
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LabDemoService {
@@ -19,45 +19,40 @@ public class LabDemoService {
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
 
-    // ==========================================
-    // ДЕМОНСТРАЦИЯ ТРАНЗАКЦИЙ (ОТКАТ ОШИБКИ)
-    // ==========================================
 
     public void saveDataWithoutTransaction() {
         User user = User.builder().username("hacker_no_tx").email("fail@mail.com").build();
-        userRepository.save(user); // 1. Юзер сохранится в БД НАВСЕГДА
+        userRepository.save(user);
 
-        // 2. Выбрасываем исключение
+
         if (true) throw new IllegalStateException("Ошибка сервера! Но юзер уже в БД, так как нет транзакции.");
 
         Chat chat = Chat.builder().title("Чат без транзакции").createdAt(LocalDateTime.now()).build();
-        chatRepository.save(chat); // До сюда код никогда не дойдет
+        chatRepository.save(chat);
     }
 
     @Transactional
     public void saveDataWithTransaction() {
         User user = User.builder().username("hacker_with_tx").email("safe@mail.com").build();
-        userRepository.save(user); // 1. Юзер "как бы" сохраняется
+        userRepository.save(user);
 
-        // 2. Выбрасываем исключение
+
         if (true) throw new IllegalStateException("Ошибка! Сработает ROLLBACK, и юзер исчезнет из БД.");
 
         Chat chat = Chat.builder().title("Транзакционный чат").createdAt(LocalDateTime.now()).build();
-        chatRepository.save(chat); // До сюда код никогда не дойдет
+        chatRepository.save(chat);
     }
 
-    // ==========================================
-    // ДЕМОНСТРАЦИЯ ПРОБЛЕМЫ N+1
-    // ==========================================
+
 
     @Transactional(readOnly = true)
     public void demonstrateNPlusOneProblem() {
         log.info("========== ПРОБЛЕМА N+1 (НАЧАЛО) ==========");
-        // 1 запрос достает все чаты
+
         List<Chat> chats = chatRepository.findAll();
 
         for (Chat chat : chats) {
-            // N запросов: для каждого чата Hibernate делает отдельный SELECT в таблицу messages
+
             int messagesCount = chat.getMessages().size();
             log.info("Чат {} содержит {} сообщений", chat.getId(), messagesCount);
         }
@@ -67,11 +62,11 @@ public class LabDemoService {
     @Transactional(readOnly = true)
     public void demonstrateNPlusOneSolution() {
         log.info("========== РЕШЕНИЕ N+1 (НАЧАЛО) ==========");
-        // Всего 1 запрос достает ВСЁ: и чаты, и их сообщения через JOIN благодаря @EntityGraph
+
         List<Chat> chats = chatRepository.findAllWithMessages();
 
         for (Chat chat : chats) {
-            // Запросов к БД больше нет, данные уже в оперативной памяти
+
             int messagesCount = chat.getMessages().size();
             log.info("Чат {} содержит {} сообщений", chat.getId(), messagesCount);
         }

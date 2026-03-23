@@ -1,6 +1,7 @@
 package com.example.messenger.service.impl;
 
 import com.example.messenger.domain.dto.MessageDto;
+import com.example.messenger.domain.dto.MessageSearchKey;
 import com.example.messenger.domain.model.Chat;
 import com.example.messenger.domain.model.Message;
 import com.example.messenger.domain.model.User;
@@ -10,11 +11,18 @@ import com.example.messenger.repository.MessageRepository;
 import com.example.messenger.repository.UserRepository;
 import com.example.messenger.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
@@ -23,6 +31,45 @@ public class MessageServiceImpl implements MessageService {
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
     private final MessageMapper mapper;
+
+    // IN-MEMORY ИНДЕКС (КЭШ)
+    private final Map<MessageSearchKey, Page<MessageDto>> messageCache = new ConcurrentHashMap<>();
+
+    // --- МЕТОДЫ ПОИСКА И КЭШИРОВАНИЯ ---
+
+    @Override
+    public Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable) {
+        MessageSearchKey key = new MessageSearchKey(chatTitle, keyword, pageable.getPageNumber(), pageable.getPageSize());
+
+        // Проверяем, есть ли данные в кэше
+        if (messageCache.containsKey(key)) {
+            log.info("Данные взяты из IN-MEMORY КЭША! Ключ: chatTitle={}, keyword={}, page={}", chatTitle, keyword, pageable.getPageNumber());
+            return messageCache.get(key);
+        }
+
+        log.info("Данных нет в кэше. Делаем запрос в БД (JPQL)...");
+        Page<MessageDto> result = repository.searchByChatAndContentJpql(chatTitle, keyword, pageable)
+                .map(mapper::toDto);
+
+        // Сохраняем результат в кэш
+        messageCache.put(key, result);
+        return result;
+    }
+
+    @Override
+    public Page<MessageDto> searchMessagesNative(String chatTitle, String keyword, Pageable pageable) {
+        log.info("Вызов Native Query (без кэша для сравнения производительности)");
+        return repository.searchByChatAndContentNative(chatTitle, keyword, pageable).map(mapper::toDto);
+    }
+
+    // --- ИНВАЛИДАЦИЯ КЭША ПРИ ИЗМЕНЕНИИ ДАННЫХ ---
+
+    private void invalidateCache() {
+        log.info("ИНВАЛИДАЦИЯ КЭША: очистка {} записей из-за изменения данных.", messageCache.size());
+        messageCache.clear();
+    }
+
+    // --- СТАНДАРТНЫЕ CRUD МЕТОДЫ ---
 
     @Override
     @Transactional
@@ -41,6 +88,7 @@ public class MessageServiceImpl implements MessageService {
         entity.setChat(chat);
         entity.setTimestamp(LocalDateTime.now());
 
+        invalidateCache(); // СБРОС КЭША
         return mapper.toDto(repository.save(entity));
     }
 
@@ -70,6 +118,8 @@ public class MessageServiceImpl implements MessageService {
         Message message = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
         message.setContent(newContent);
+
+        invalidateCache(); // СБРОС КЭША
         return mapper.toDto(repository.save(message));
     }
 
@@ -79,5 +129,7 @@ public class MessageServiceImpl implements MessageService {
         Message message = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
         repository.delete(message);
+
+        invalidateCache(); // СБРОС КЭША
     }
 }

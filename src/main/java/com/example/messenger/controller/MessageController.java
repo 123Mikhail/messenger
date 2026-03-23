@@ -3,8 +3,13 @@ package com.example.messenger.controller;
 import com.example.messenger.domain.dto.MessageDto;
 import com.example.messenger.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -48,5 +53,29 @@ public class MessageController {
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
         messageService.deleteMessage(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // --- ЭНДПОИНТЫ ДЛЯ ЛАБОРАТОРНОЙ №3 (ПОИСК С КЭШЕМ И ПАГИНАЦИЕЙ) ---
+
+    @GetMapping("/search/jpql")
+    public ResponseEntity<Page<MessageDto>> searchJpql(
+            @RequestParam String chatTitle,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+        return ResponseEntity.ok(messageService.searchMessagesJpql(chatTitle, keyword, pageable));
+    }
+
+    @GetMapping("/search/native")
+    public ResponseEntity<Page<MessageDto>> searchNative(
+            @RequestParam String chatTitle,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+        return ResponseEntity.ok(messageService.searchMessagesNative(chatTitle, keyword, pageable));
     }
 }

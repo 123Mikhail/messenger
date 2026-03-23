@@ -27,10 +27,20 @@ public class User {
     private String email;
 
     @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles = new ArrayList<>();
+
+    @JsonIgnore
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private List<Chat> chats = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    // ЗДЕСЬ ДОБАВЛЕНО: cascade = CascadeType.ALL, orphanRemoval = true
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Message> messages = new ArrayList<>();
 }
