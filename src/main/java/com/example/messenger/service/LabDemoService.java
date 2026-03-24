@@ -25,7 +25,9 @@ public class LabDemoService {
         userRepository.save(user);
 
 
-        if (true) throw new IllegalStateException("Ошибка сервера! Но юзер уже в БД, так как нет транзакции.");
+        if (true) {
+            throw new IllegalStateException("Ошибка сервера! Но юзер уже в БД, так как нет транзакции.");
+        }
 
         Chat chat = Chat.builder().title("Чат без транзакции").createdAt(LocalDateTime.now()).build();
         chatRepository.save(chat);
@@ -36,8 +38,9 @@ public class LabDemoService {
         User user = User.builder().username("hacker_with_tx").email("safe@mail.com").build();
         userRepository.save(user);
 
-
-        if (true) throw new IllegalStateException("Ошибка! Сработает ROLLBACK, и юзер исчезнет из БД.");
+        if (true) {
+            throw new IllegalStateException("Ошибка! Сработает ROLLBACK, и юзер исчезнет из БД.");
+        }
 
         Chat chat = Chat.builder().title("Транзакционный чат").createdAt(LocalDateTime.now()).build();
         chatRepository.save(chat);

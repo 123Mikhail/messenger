@@ -17,8 +17,12 @@ public class MessageSearchKey {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MessageSearchKey that = (MessageSearchKey) o;
         return pageNumber == that.pageNumber &&
                 pageSize == that.pageSize &&
