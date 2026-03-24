@@ -32,16 +32,16 @@ public class MessageServiceImpl implements MessageService {
     private final ChatRepository chatRepository;
     private final MessageMapper mapper;
 
-    // IN-MEMORY ИНДЕКС (КЭШ)
+
     private final Map<MessageSearchKey, Page<MessageDto>> messageCache = new ConcurrentHashMap<>();
 
-    // --- МЕТОДЫ ПОИСКА И КЭШИРОВАНИЯ ---
+
 
     @Override
     public Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable) {
         MessageSearchKey key = new MessageSearchKey(chatTitle, keyword, pageable.getPageNumber(), pageable.getPageSize());
 
-        // Проверяем, есть ли данные в кэше
+
         if (messageCache.containsKey(key)) {
             log.info("Данные взяты из IN-MEMORY КЭША! Ключ: chatTitle={}, keyword={}, page={}", chatTitle, keyword, pageable.getPageNumber());
             return messageCache.get(key);
@@ -51,7 +51,7 @@ public class MessageServiceImpl implements MessageService {
         Page<MessageDto> result = repository.searchByChatAndContentJpql(chatTitle, keyword, pageable)
                 .map(mapper::toDto);
 
-        // Сохраняем результат в кэш
+
         messageCache.put(key, result);
         return result;
     }
@@ -62,14 +62,14 @@ public class MessageServiceImpl implements MessageService {
         return repository.searchByChatAndContentNative(chatTitle, keyword, pageable).map(mapper::toDto);
     }
 
-    // --- ИНВАЛИДАЦИЯ КЭША ПРИ ИЗМЕНЕНИИ ДАННЫХ ---
+
 
     private void invalidateCache() {
         log.info("ИНВАЛИДАЦИЯ КЭША: очистка {} записей из-за изменения данных.", messageCache.size());
         messageCache.clear();
     }
 
-    // --- СТАНДАРТНЫЕ CRUD МЕТОДЫ ---
+
 
     @Override
     @Transactional

@@ -55,7 +55,7 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- ЭНДПОИНТЫ ДЛЯ ЛАБОРАТОРНОЙ №3 (ПОИСК С КЭШЕМ И ПАГИНАЦИЕЙ) ---
+
 
     @GetMapping("/search/jpql")
     public ResponseEntity<Page<MessageDto>> searchJpql(
