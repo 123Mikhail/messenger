@@ -38,7 +38,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- НОВЫЕ ЭНДПОИНТЫ ДЛЯ ПОЛУЧЕНИЯ ПОЛЬЗОВАТЕЛЕЙ ---
+
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {

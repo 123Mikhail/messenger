@@ -48,7 +48,7 @@ public class ChatController {
         return ResponseEntity.noContent().build();
     }
 
-    // --- НОВЫЕ ЭНДПОИНТЫ ДЛЯ ПОЛУЧЕНИЯ ЧАТОВ ---
+
 
     @GetMapping
     public ResponseEntity<List<Chat>> getAllChats() {

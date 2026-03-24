@@ -40,7 +40,7 @@ public class User {
     private List<Chat> chats = new ArrayList<>();
 
     @JsonIgnore
-    // ЗДЕСЬ ДОБАВЛЕНО: cascade = CascadeType.ALL, orphanRemoval = true
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Message> messages = new ArrayList<>();
 }

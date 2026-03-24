@@ -17,7 +17,7 @@ public class MessageMapper {
         if (message.getUser() != null) {
             dto.setSender(message.getUser().getUsername());
         }
-        // Достаем ID чата
+
         if (message.getChat() != null) {
             dto.setChatId(message.getChat().getId());
         }

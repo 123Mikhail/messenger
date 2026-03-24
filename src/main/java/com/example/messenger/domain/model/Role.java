@@ -16,9 +16,9 @@ public class Role {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String name; // Например: ADMIN, USER
+    private String name;
 
-    // Обратная сторона ManyToMany
+
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<User> users;
 }

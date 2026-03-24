@@ -88,7 +88,7 @@ public class MessageServiceImpl implements MessageService {
         entity.setChat(chat);
         entity.setTimestamp(LocalDateTime.now());
 
-        invalidateCache(); // СБРОС КЭША
+        invalidateCache();
         return mapper.toDto(repository.save(entity));
     }
 
@@ -119,7 +119,7 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
         message.setContent(newContent);
 
-        invalidateCache(); // СБРОС КЭША
+        invalidateCache();
         return mapper.toDto(repository.save(message));
     }
 
@@ -130,6 +130,6 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new IllegalArgumentException("Сообщение не найдено"));
         repository.delete(message);
 
-        invalidateCache(); // СБРОС КЭША
+        invalidateCache();
     }
 }

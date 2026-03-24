@@ -31,21 +31,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД УДАЛЕНИЯ ПОЛЬЗОВАТЕЛЯ
+
     @Override
     @Transactional
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
-        // 1. Отвязываем пользователя от всех чатов,
-        // чтобы не было ошибки внешнего ключа в таблице chat_members
+
         for (Chat chat : user.getChats()) {
             chat.getMembers().remove(user);
         }
 
-        // 2. Теперь безопасно удаляем пользователя
-        // (его сообщения удалятся автоматически благодаря CascadeType.ALL в классе User)
+
         userRepository.delete(user);
     }
 

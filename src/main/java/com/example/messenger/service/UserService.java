@@ -8,7 +8,7 @@ public interface UserService {
     User updateUsername(Long userId, String newUsername);
     void deleteUser(Long userId);
 
-    // НОВЫЕ МЕТОДЫ: Получение пользователей
+
     List<User> getAllUsers();
     User getUserById(Long userId);
 }

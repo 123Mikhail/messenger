@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class MessageDto {
     private Long id;
     private String sender;
-    private Long chatId; // Указываем, в какой чат отправляем
+    private Long chatId;
     private String content;
     private LocalDateTime timestamp;
 }

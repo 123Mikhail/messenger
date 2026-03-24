@@ -88,7 +88,7 @@ public class ChatServiceImpl implements ChatService {
         return chatRepository.save(chat);
     }
 
-    // --- НОВЫЕ МЕТОДЫ И ЧТЕНИЕ ДАННЫХ ---
+
 
     @Override
     public List<Chat> getSubChats(Long parentId) {

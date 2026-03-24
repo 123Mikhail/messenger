@@ -11,7 +11,7 @@ public interface ChatService {
     void deleteChat(Long chatId);
     Chat updateChatTitle(Long chatId, String newTitle);
 
-    // НОВЫЕ МЕТОДЫ: Получение чатов
+
     Chat getById(Long id);
     List<Chat> getAllChats();
 }

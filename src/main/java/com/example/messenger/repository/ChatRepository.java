@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
-    // РЕШЕНИЕ ПРОБЛЕМЫ N+1
+
     @EntityGraph(attributePaths = {"messages"})
     @Query("SELECT c FROM Chat c")
     List<Chat> findAllWithMessages();

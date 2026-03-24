@@ -15,7 +15,7 @@ public interface MessageService {
     MessageDto updateMessage(Long id, String newContent);
     void deleteMessage(Long id);
 
-    // Новые методы для Лабораторной №3 (Поиск и Пагинация)
+
     Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable);
     Page<MessageDto> searchMessagesNative(String chatTitle, String keyword, Pageable pageable);
 }
