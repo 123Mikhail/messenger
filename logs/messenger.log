@@ -1,0 +1,34 @@
+2026-04-02 01:26:15.922 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m16s901ms151µs).
+2026-04-02 10:57:39.216 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9h13m55s596ms981µs).
+2026-04-02 11:35:24.795 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m15s483ms611µs300ns).
+2026-04-02 11:51:11.604 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m16s783ms189µs300ns).
+2026-04-02 11:57:05.769 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m24s154ms430µs400ns).
+2026-04-02 13:12:21.377 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-02 13:12:21.389 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-04-02 13:12:21.402 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-02 13:12:21.425 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-02 13:12:21.429 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-02 13:16:51.634 [main] INFO  c.e.messenger.MessengerApplication - Starting MessengerApplication using Java 21.0.10 with PID 16212 (C:\Users\User\Desktop\мессенджер\messenger\target\classes started by User in C:\Users\User\Desktop\мессенджер\messenger)
+2026-04-02 13:16:51.635 [main] DEBUG c.e.messenger.MessengerApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
+2026-04-02 13:16:51.635 [main] INFO  c.e.messenger.MessengerApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-02 13:16:52.082 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-02 13:16:52.115 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 29 ms. Found 3 JPA repository interfaces.
+2026-04-02 13:16:52.596 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-04-02 13:16:52.609 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-02 13:16:52.609 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-04-02 13:16:52.646 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-02 13:16:52.646 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 988 ms
+2026-04-02 13:16:53.072 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-02 13:16:53.096 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-02 13:16:53.353 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@77d95e5a
+2026-04-02 13:16:53.355 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-02 13:16:54.756 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-02 13:16:55.028 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-02 13:16:55.595 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-02 13:16:56.012 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-04-02 13:16:56.018 [main] INFO  c.e.messenger.MessengerApplication - Started MessengerApplication in 4.661 seconds (process running for 5.403)
+2026-04-02 13:16:57.487 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-02 13:16:57.489 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-02 13:16:57.489 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2026-04-02 13:16:57.568 [http-nio-8080-exec-1] WARN  c.e.m.e.GlobalExceptionHandler - Ошибка валидации входящих данных: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.example.messenger.domain.dto.MessageDto> com.example.messenger.controller.MessageController.create(com.example.messenger.domain.dto.MessageDto) with 2 errors: [Field error in object 'messageDto' on field 'chatId': rejected value [null]; codes [NotNull.messageDto.chatId,NotNull.chatId,NotNull.java.lang.Long,NotNull]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [messageDto.chatId,chatId]; arguments []; default message [chatId]]; default message [ID чата обязателен]] [Field error in object 'messageDto' on field 'content': rejected value []; codes [NotBlank.messageDto.content,NotBlank.content,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [messageDto.content,content]; arguments []; default message [content]]; default message [Сообщение не должно быть пустым]] 
+2026-04-02 13:18:53.221 [http-nio-8080-exec-3] WARN  c.e.m.e.GlobalExceptionHandler - Конфликт состояний (409): Сообщение заблокировано системой антиспама!
