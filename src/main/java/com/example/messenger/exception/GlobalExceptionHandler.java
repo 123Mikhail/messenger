@@ -17,7 +17,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Обработка ошибок валидации (400 Bad Request)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         log.warn("Ошибка валидации входящих данных: {}", ex.getMessage());
@@ -37,7 +36,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // 2. Обработка конфликтов бизнес-логики (409 Conflict)
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalStateException(IllegalStateException ex) {
         log.warn("Конфликт состояний (409): {}", ex.getMessage());
@@ -51,7 +49,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    // 3. Обработка бизнес-ошибок (404 Not Found)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("Бизнес-ошибка: {}", ex.getMessage());
@@ -65,7 +62,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    // 4. Обработка всех остальных непредвиденных ошибок (500 Internal Server Error)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleAllOtherExceptions(Exception ex) {
         log.error("Внутренняя ошибка сервера: ", ex);

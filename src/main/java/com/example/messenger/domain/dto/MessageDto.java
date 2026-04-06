@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-@NoArgsConstructor // Возвращает пустой конструктор (new MessageDto())
-@AllArgsConstructor // Нужен для правильной работы @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "DTO для передачи данных о сообщении")
 public class MessageDto {
 

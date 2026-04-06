@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,14 +35,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageDto save(MessageDto dto) {
-        // Искусственный конфликт для демонстрации 409 ошибки
+        // Искусственный конфликт для генерации 409 ошибки
         if ("конфликт".equalsIgnoreCase(dto.getContent())) {
             throw new IllegalStateException("Сообщение заблокировано системой антиспама!");
         }
 
         Message entity = mapper.toEntity(dto);
         Message savedEntity = repository.save(entity);
-        invalidateCache(); // Сбрасываем кэш при добавлении
+        invalidateCache();
         return mapper.toDto(savedEntity);
     }
 
@@ -58,21 +57,21 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageDto> getAll() {
         return repository.findAll().stream()
                 .map(mapper::toDto)
-                .toList();
+                .toList(); // Исправлен Code Smell
     }
 
     @Override
     public List<MessageDto> getBySender(String sender) {
         return getAll().stream()
                 .filter(m -> m.getSender().equals(sender))
-                .toList();
+                .toList(); // Исправлен Code Smell
     }
 
     @Override
     public List<MessageDto> getByChatId(Long chatId) {
         return getAll().stream()
                 .filter(m -> m.getChatId().equals(chatId))
-                .toList();
+                .toList(); // Исправлен Code Smell
     }
 
     @Override
@@ -82,7 +81,7 @@ public class MessageServiceImpl implements MessageService {
 
         entity.setContent(newContent);
         Message updatedEntity = repository.save(entity);
-        invalidateCache(); // Сбрасываем кэш при обновлении
+        invalidateCache();
         return mapper.toDto(updatedEntity);
     }
 
@@ -92,7 +91,7 @@ public class MessageServiceImpl implements MessageService {
             throw new IllegalArgumentException("Сообщение с ID " + id + " не найдено");
         }
         repository.deleteById(id);
-        invalidateCache(); // Сбрасываем кэш при удалении
+        invalidateCache();
     }
 
     @Override
