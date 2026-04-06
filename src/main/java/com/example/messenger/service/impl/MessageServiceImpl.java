@@ -58,23 +58,21 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageDto> getAll() {
         return repository.findAll().stream()
                 .map(mapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<MessageDto> getBySender(String sender) {
-        // Заглушка, если метод нужен в контроллере
         return getAll().stream()
                 .filter(m -> m.getSender().equals(sender))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<MessageDto> getByChatId(Long chatId) {
-        // Заглушка, если метод нужен в контроллере
         return getAll().stream()
                 .filter(m -> m.getChatId().equals(chatId))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
