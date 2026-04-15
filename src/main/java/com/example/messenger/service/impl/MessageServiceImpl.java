@@ -31,10 +31,8 @@ public class MessageServiceImpl implements MessageService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
 
-    // IN-MEMORY КЭШ
     private final Map<MessageSearchKey, Page<MessageDto>> messageCache = new ConcurrentHashMap<>();
 
-    // ИНВАЛИДАЦИЯ КЭША
     private void invalidateCache() {
         log.info("ИНВАЛИДАЦИЯ КЭША: очистка {} записей из-за изменения данных.", messageCache.size());
         messageCache.clear();
@@ -51,18 +49,13 @@ public class MessageServiceImpl implements MessageService {
 
         Message entity = mapper.toEntity(dto);
 
-        // Ищем и привязываем чат
         Chat chat = chatRepository.findById(dto.getChatId())
                 .orElseThrow(() -> new IllegalArgumentException("Чат с ID " + dto.getChatId() + " не найден"));
         entity.setChat(chat);
 
-        // Ищем и привязываем пользователя (автора)
         User user = userRepository.findByUsername(dto.getSender())
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь с именем " + dto.getSender() + " не найден"));
 
-        /* * ВАЖНО: Если слово setUser горит красным, значит в твоем классе Message
-         * это поле называется по-другому. Просто поменяй на entity.setSender(user);
-         */
         entity.setUser(user);
 
         Message savedEntity = repository.save(entity);
