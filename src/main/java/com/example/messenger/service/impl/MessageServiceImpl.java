@@ -34,12 +34,16 @@ public class MessageServiceImpl implements MessageService {
     private final Map<MessageSearchKey, Page<MessageDto>> messageCache = new ConcurrentHashMap<>();
 
     private void invalidateCache() {
-        log.info("ИНВАЛИДАЦИЯ КЭША: очистка {} записей из-за изменения данных.", messageCache.size());
         messageCache.clear();
     }
 
     @Override
     public MessageDto save(MessageDto dto) {
+        // Защита от пустых данных
+        if (dto.getChatId() == null || dto.getSender() == null) {
+            throw new IllegalArgumentException("Ошибка: chatId и sender обязательны для заполнения!");
+        }
+
         if ("конфликт".equalsIgnoreCase(dto.getContent())) {
             throw new IllegalStateException("Сообщение заблокировано системой антиспама!");
         }
@@ -54,8 +58,7 @@ public class MessageServiceImpl implements MessageService {
         entity.setChat(chat);
 
         User user = userRepository.findByUsername(dto.getSender())
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с именем " + dto.getSender() + " не найден"));
-
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь " + dto.getSender() + " не найден"));
         entity.setUser(user);
 
         Message savedEntity = repository.save(entity);
@@ -72,30 +75,23 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<MessageDto> getAll() {
-        return repository.findAll().stream()
-                .map(mapper::toDto)
-                .toList();
+        return repository.findAll().stream().map(mapper::toDto).toList();
     }
 
     @Override
     public List<MessageDto> getBySender(String sender) {
-        return getAll().stream()
-                .filter(m -> m.getSender().equals(sender))
-                .toList();
+        return getAll().stream().filter(m -> m.getSender().equals(sender)).toList();
     }
 
     @Override
     public List<MessageDto> getByChatId(Long chatId) {
-        return getAll().stream()
-                .filter(m -> m.getChatId().equals(chatId))
-                .toList();
+        return getAll().stream().filter(m -> m.getChatId().equals(chatId)).toList();
     }
 
     @Override
     public MessageDto updateMessage(Long id, String newContent) {
         Message entity = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Сообщение с ID " + id + " не найдено"));
-
         entity.setContent(newContent);
         Message updatedEntity = repository.save(entity);
         invalidateCache();
@@ -114,24 +110,15 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable) {
         MessageSearchKey key = new MessageSearchKey(chatTitle, keyword, pageable.getPageNumber(), pageable.getPageSize());
+        if (messageCache.containsKey(key)) return messageCache.get(key);
 
-        if (messageCache.containsKey(key)) {
-            log.info("Данные взяты из IN-MEMORY КЭША! Ключ: chatTitle={}, keyword={}, page={}", chatTitle, keyword, pageable.getPageNumber());
-            return messageCache.get(key);
-        }
-
-        log.info("Данных нет в кэше. Делаем запрос в БД (JPQL)...");
-        Page<MessageDto> result = repository.searchByChatAndContentJpql(chatTitle, keyword, pageable)
-                .map(mapper::toDto);
-
+        Page<MessageDto> result = repository.searchByChatAndContentJpql(chatTitle, keyword, pageable).map(mapper::toDto);
         messageCache.put(key, result);
         return result;
     }
 
     @Override
     public Page<MessageDto> searchMessagesNative(String chatTitle, String keyword, Pageable pageable) {
-        log.info("Вызов Native Query (без кэша для сравнения производительности)");
-        return repository.searchByChatAndContentNative(chatTitle, keyword, pageable)
-                .map(mapper::toDto);
+        return repository.searchByChatAndContentNative(chatTitle, keyword, pageable).map(mapper::toDto);
     }
 }
