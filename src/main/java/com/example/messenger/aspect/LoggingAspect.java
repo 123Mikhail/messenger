@@ -11,12 +11,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LoggingAspect {
 
-    // Перехватываем ВСЕ методы во ВСЕХ классах внутри пакета service.impl
     @Around("execution(* com.example.messenger.service.impl.*.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
 
-        // Выполняем сам метод
+
         Object proceed = joinPoint.proceed();
 
         long executionTime = System.currentTimeMillis() - start;

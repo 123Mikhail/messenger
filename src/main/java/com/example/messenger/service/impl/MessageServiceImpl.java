@@ -2,9 +2,13 @@ package com.example.messenger.service.impl;
 
 import com.example.messenger.domain.dto.MessageDto;
 import com.example.messenger.domain.dto.MessageSearchKey;
+import com.example.messenger.domain.model.Chat;
 import com.example.messenger.domain.model.Message;
+import com.example.messenger.domain.model.User;
 import com.example.messenger.mapper.MessageMapper;
+import com.example.messenger.repository.ChatRepository;
 import com.example.messenger.repository.MessageRepository;
+import com.example.messenger.repository.UserRepository;
 import com.example.messenger.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,6 +28,8 @@ public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository repository;
     private final MessageMapper mapper;
+    private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
 
     // IN-MEMORY КЭШ
     private final Map<MessageSearchKey, Page<MessageDto>> messageCache = new ConcurrentHashMap<>();
@@ -35,12 +42,29 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageDto save(MessageDto dto) {
-        // Искусственный конфликт для генерации 409 ошибки
         if ("конфликт".equalsIgnoreCase(dto.getContent())) {
             throw new IllegalStateException("Сообщение заблокировано системой антиспама!");
         }
 
+        dto.setId(null);
+        dto.setTimestamp(LocalDateTime.now());
+
         Message entity = mapper.toEntity(dto);
+
+        // Ищем и привязываем чат
+        Chat chat = chatRepository.findById(dto.getChatId())
+                .orElseThrow(() -> new IllegalArgumentException("Чат с ID " + dto.getChatId() + " не найден"));
+        entity.setChat(chat);
+
+        // Ищем и привязываем пользователя (автора)
+        User user = userRepository.findByUsername(dto.getSender())
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь с именем " + dto.getSender() + " не найден"));
+
+        /* * ВАЖНО: Если слово setUser горит красным, значит в твоем классе Message
+         * это поле называется по-другому. Просто поменяй на entity.setSender(user);
+         */
+        entity.setUser(user);
+
         Message savedEntity = repository.save(entity);
         invalidateCache();
         return mapper.toDto(savedEntity);
@@ -57,21 +81,21 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageDto> getAll() {
         return repository.findAll().stream()
                 .map(mapper::toDto)
-                .toList(); // Исправлен Code Smell
+                .toList();
     }
 
     @Override
     public List<MessageDto> getBySender(String sender) {
         return getAll().stream()
                 .filter(m -> m.getSender().equals(sender))
-                .toList(); // Исправлен Code Smell
+                .toList();
     }
 
     @Override
     public List<MessageDto> getByChatId(Long chatId) {
         return getAll().stream()
                 .filter(m -> m.getChatId().equals(chatId))
-                .toList(); // Исправлен Code Smell
+                .toList();
     }
 
     @Override
