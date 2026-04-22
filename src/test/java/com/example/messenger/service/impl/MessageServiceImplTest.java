@@ -1,7 +1,5 @@
 package com.example.messenger.service.impl;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+
 import com.example.messenger.domain.dto.MessageDto;
 import com.example.messenger.domain.model.Chat;
 import com.example.messenger.domain.model.Message;
