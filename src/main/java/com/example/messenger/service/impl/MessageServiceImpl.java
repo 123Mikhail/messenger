@@ -124,7 +124,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable) {
         MessageSearchKey key = new MessageSearchKey(chatTitle, keyword, pageable.getPageNumber(), pageable.getPageSize());
-        if (messageCache.containsKey(key)) return messageCache.get(key);
+        if (messageCache.containsKey(key)) {return messageCache.get(key);}
         Page<MessageDto> result = repository.searchByChatAndContentJpql(chatTitle, keyword, pageable).map(mapper::toDto);
         messageCache.put(key, result);
         return result;

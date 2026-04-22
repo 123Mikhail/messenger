@@ -27,12 +27,12 @@ public class MessageController {
 
     @Operation(summary = "Отправить новое сообщение")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Сообщение успешно создано"),
-            @ApiResponse(responseCode = "400", description = "Некорректные данные или чат/пользователь не существует",
+        @ApiResponse(responseCode = "200", description = "Сообщение успешно создано"),
+        @ApiResponse(responseCode = "400", description = "Некорректные данные или чат/пользователь не существует",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Запрашиваемая сущность не найдена",
+        @ApiResponse(responseCode = "404", description = "Запрашиваемая сущность не найдена",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Сообщение заблокировано антиспамом",
+        @ApiResponse(responseCode = "409", description = "Сообщение заблокировано антиспамом",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping
