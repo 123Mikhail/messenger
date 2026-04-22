@@ -15,10 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -39,7 +42,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageDto save(MessageDto dto) {
-        // Защита от пустых данных
         if (dto.getChatId() == null || dto.getSender() == null) {
             throw new IllegalArgumentException("Ошибка: chatId и sender обязательны для заполнения!");
         }
@@ -64,6 +66,18 @@ public class MessageServiceImpl implements MessageService {
         Message savedEntity = repository.save(entity);
         invalidateCache();
         return mapper.toDto(savedEntity);
+    }
+
+    @Transactional
+    @Override
+    public List<MessageDto> saveAll(List<MessageDto> dtos) {
+        log.info("Начало массового сохранения {} сообщений", dtos != null ? dtos.size() : 0);
+
+        return Optional.ofNullable(dtos)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(this::save)
+                .toList();
     }
 
     @Override
@@ -111,7 +125,6 @@ public class MessageServiceImpl implements MessageService {
     public Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable) {
         MessageSearchKey key = new MessageSearchKey(chatTitle, keyword, pageable.getPageNumber(), pageable.getPageSize());
         if (messageCache.containsKey(key)) return messageCache.get(key);
-
         Page<MessageDto> result = repository.searchByChatAndContentJpql(chatTitle, keyword, pageable).map(mapper::toDto);
         messageCache.put(key, result);
         return result;
