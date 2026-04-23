@@ -52,10 +52,9 @@ class MessageServiceImplTest {
 
     @Test
     void save_MissingFields_ThrowsException() {
-        // Обе переменные null
-        assertThrows(IllegalArgumentException.class, () -> messageService.save(new MessageDto()));
+        MessageDto emptyDto = new MessageDto();
+        assertThrows(IllegalArgumentException.class, () -> messageService.save(emptyDto));
 
-        // chatId есть, sender null (Это то самое условие, которого не хватало для 100%!)
         MessageDto dto2 = new MessageDto();
         dto2.setChatId(1L);
         assertThrows(IllegalArgumentException.class, () -> messageService.save(dto2));

@@ -46,7 +46,6 @@ class ChatServiceImplTest {
 
     @Test
     void createChat_EmptyUsernamesList() {
-        // Проверяем условие, когда список юзеров пустой (закрываем скрытую ветку Stream API)
         when(chatRepository.save(any(Chat.class))).thenReturn(new Chat());
         assertNotNull(chatService.createChat("Title", Collections.emptyList(), null));
     }
@@ -54,14 +53,16 @@ class ChatServiceImplTest {
     @Test
     void createChat_UserNotFound() {
         when(userRepository.findByUsername("Ghost")).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", List.of("Ghost"), null));
+        List<String> ghostList = List.of("Ghost");
+        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", ghostList, null));
     }
 
     @Test
     void createChat_ParentNotFound() {
         when(userRepository.findByUsername("User1")).thenReturn(Optional.of(new User()));
         when(chatRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", List.of("User1"), 2L));
+        List<String> userList = List.of("User1");
+        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", userList, 2L));
     }
 
     @Test
@@ -152,7 +153,6 @@ class ChatServiceImplTest {
 
     @Test
     void getById_NotFound() {
-        // Закрываем скрытую ветку orElse(null)
         when(chatRepository.findById(1L)).thenReturn(Optional.empty());
         assertNull(chatService.getById(1L));
     }
