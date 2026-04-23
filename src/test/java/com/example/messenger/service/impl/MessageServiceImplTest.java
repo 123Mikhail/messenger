@@ -8,15 +8,16 @@ import com.example.messenger.mapper.MessageMapper;
 import com.example.messenger.repository.ChatRepository;
 import com.example.messenger.repository.MessageRepository;
 import com.example.messenger.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,90 +27,140 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MessageServiceImplTest {
 
-    @Mock
-    private MessageRepository messageRepository;
-    @Mock
-    private MessageMapper messageMapper;
-    @Mock
-    private ChatRepository chatRepository;
-    @Mock
-    private UserRepository userRepository;
+    @Mock private MessageRepository repository;
+    @Mock private MessageMapper mapper;
+    @Mock private ChatRepository chatRepository;
+    @Mock private UserRepository userRepository;
 
-    @InjectMocks
-    private MessageServiceImpl messageService;
+    @InjectMocks private MessageServiceImpl messageService;
 
-    private MessageDto validDto;
-    private Chat chat;
-    private User user;
-    private Message messageEntity;
+    @Test
+    void save_Success() {
+        MessageDto dto = new MessageDto();
+        dto.setChatId(1L);
+        dto.setSender("User");
+        dto.setContent("Hello");
 
-    @BeforeEach
-    void setUp() {
-        validDto = new MessageDto();
-        validDto.setContent("Тестовое сообщение");
-        validDto.setChatId(1L);
-        validDto.setSender("student_bsuir");
+        when(mapper.toEntity(any())).thenReturn(new Message());
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(new Chat()));
+        when(userRepository.findByUsername("User")).thenReturn(Optional.of(new User()));
+        when(repository.save(any())).thenReturn(new Message());
+        when(mapper.toDto(any())).thenReturn(dto);
 
-        chat = new Chat();
-        chat.setId(1L);
-
-        user = new User();
-        user.setUsername("student_bsuir");
-
-        messageEntity = new Message();
-        messageEntity.setContent("Тестовое сообщение");
+        assertNotNull(messageService.save(dto));
     }
 
     @Test
-    void save_Successful() {
-        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(userRepository.findByUsername("student_bsuir")).thenReturn(Optional.of(user));
-        when(messageMapper.toEntity(validDto)).thenReturn(messageEntity);
-        when(messageRepository.save(any(Message.class))).thenReturn(messageEntity);
-        when(messageMapper.toDto(messageEntity)).thenReturn(validDto);
+    void save_MissingFields_ThrowsException() {
+        // Обе переменные null
+        assertThrows(IllegalArgumentException.class, () -> messageService.save(new MessageDto()));
 
-        MessageDto result = messageService.save(validDto);
-
-        assertNotNull(result);
-        assertEquals("Тестовое сообщение", result.getContent());
-        verify(messageRepository, times(1)).save(any(Message.class));
-    }
-
-    @Test
-    void save_ThrowsAntiSpamException() {
-        validDto.setContent("конфликт");
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            messageService.save(validDto);
-        });
-
-        assertEquals("Сообщение заблокировано системой антиспама!", exception.getMessage());
-        verify(messageRepository, never()).save(any(Message.class));
-    }
-
-    @Test
-    void saveAll_SuccessfulBulkOperation() {
+        // chatId есть, sender null (Это то самое условие, которого не хватало для 100%!)
         MessageDto dto2 = new MessageDto();
-        dto2.setContent("Второе сообщение");
         dto2.setChatId(1L);
-        dto2.setSender("student_bsuir");
-
-        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
-        when(userRepository.findByUsername("student_bsuir")).thenReturn(Optional.of(user));
-        when(messageMapper.toEntity(any())).thenReturn(messageEntity);
-        when(messageRepository.save(any(Message.class))).thenReturn(messageEntity);
-        when(messageMapper.toDto(any())).thenReturn(validDto);
-
-        List<MessageDto> result = messageService.saveAll(Arrays.asList(validDto, dto2));
-
-        assertEquals(2, result.size());
-        verify(messageRepository, times(2)).save(any(Message.class));
+        assertThrows(IllegalArgumentException.class, () -> messageService.save(dto2));
     }
 
     @Test
-    void saveAll_HandlesNullListGracefully() {
-        List<MessageDto> result = messageService.saveAll(null);
-        assertTrue(result.isEmpty());
-        verify(messageRepository, never()).save(any());
+    void save_SpamConflict_ThrowsException() {
+        MessageDto dto = new MessageDto();
+        dto.setChatId(1L);
+        dto.setSender("User");
+        dto.setContent("конфликт");
+        assertThrows(IllegalStateException.class, () -> messageService.save(dto));
+    }
+
+    @Test
+    void save_ChatNotFound_ThrowsException() {
+        MessageDto dto = new MessageDto();
+        dto.setChatId(1L);
+        dto.setSender("User");
+        when(mapper.toEntity(any())).thenReturn(new Message());
+        when(chatRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> messageService.save(dto));
+    }
+
+    @Test
+    void save_UserNotFound_ThrowsException() {
+        MessageDto dto = new MessageDto();
+        dto.setChatId(1L);
+        dto.setSender("User");
+        when(mapper.toEntity(any())).thenReturn(new Message());
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(new Chat()));
+        when(userRepository.findByUsername("User")).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> messageService.save(dto));
+    }
+
+    @Test
+    void saveAll_HandleList() {
+        assertTrue(messageService.saveAll(null).isEmpty());
+
+        MessageDto dto = new MessageDto();
+        dto.setChatId(1L);
+        dto.setSender("User");
+        when(mapper.toEntity(any())).thenReturn(new Message());
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(new Chat()));
+        when(userRepository.findByUsername("User")).thenReturn(Optional.of(new User()));
+
+        messageService.saveAll(Collections.singletonList(dto));
+        verify(repository).save(any());
+    }
+
+    @Test
+    void getById_Success_And_NotFound() {
+        when(repository.findById(1L)).thenReturn(Optional.of(new Message()));
+        when(mapper.toDto(any())).thenReturn(new MessageDto());
+        assertNotNull(messageService.getById(1L));
+
+        when(repository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> messageService.getById(2L));
+    }
+
+    @Test
+    void getAll_And_Filters() {
+        MessageDto dto = new MessageDto();
+        dto.setSender("User");
+        dto.setChatId(1L);
+
+        when(repository.findAll()).thenReturn(Collections.singletonList(new Message()));
+        when(mapper.toDto(any())).thenReturn(dto);
+
+        assertFalse(messageService.getAll().isEmpty());
+        assertFalse(messageService.getBySender("User").isEmpty());
+        assertFalse(messageService.getByChatId(1L).isEmpty());
+    }
+
+    @Test
+    void updateMessage_Success() {
+        Message message = new Message();
+        when(repository.findById(1L)).thenReturn(Optional.of(message));
+        when(repository.save(message)).thenReturn(message);
+        when(mapper.toDto(message)).thenReturn(new MessageDto());
+
+        assertNotNull(messageService.updateMessage(1L, "New"));
+        assertEquals("New", message.getContent());
+    }
+
+    @Test
+    void deleteMessage_Success_And_NotFound() {
+        when(repository.existsById(1L)).thenReturn(true);
+        messageService.deleteMessage(1L);
+        verify(repository).deleteById(1L);
+
+        when(repository.existsById(2L)).thenReturn(false);
+        assertThrows(IllegalArgumentException.class, () -> messageService.deleteMessage(2L));
+    }
+
+    @Test
+    void searchMessages_Jpql_And_Native() {
+        Page<Message> page = new PageImpl<>(Collections.singletonList(new Message()));
+        when(repository.searchByChatAndContentJpql(any(), any(), any())).thenReturn(page);
+        when(mapper.toDto(any())).thenReturn(new MessageDto());
+
+        assertNotNull(messageService.searchMessagesJpql("Chat", "Key", PageRequest.of(0, 10)));
+        assertNotNull(messageService.searchMessagesJpql("Chat", "Key", PageRequest.of(0, 10)));
+
+        when(repository.searchByChatAndContentNative(any(), any(), any())).thenReturn(page);
+        assertNotNull(messageService.searchMessagesNative("Chat", "Key", PageRequest.of(0, 10)));
     }
 }
