@@ -1,6 +1,5 @@
 package com.example.messenger.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -15,10 +14,11 @@ public class AsyncOperationService {
 
     private final Map<String, String> taskStatuses = new ConcurrentHashMap<>();
 
-    // 1. Внедряем самого себя (Spring подставит сюда тот самый Прокси-объект)
-    @Autowired
-    @Lazy
-    private AsyncOperationService self;
+    private final AsyncOperationService self;
+
+    public AsyncOperationService(@Lazy final AsyncOperationService self) {
+        this.self = self;
+    }
 
     public String startAsyncTask() {
         final String taskId = UUID.randomUUID().toString();
