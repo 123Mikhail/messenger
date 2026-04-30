@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AsyncOperationService {
 
     private final Map<String, String> taskStatuses = new ConcurrentHashMap<>();
-
     private final AsyncOperationService self;
 
     public AsyncOperationService(@Lazy final AsyncOperationService self) {
@@ -22,7 +21,8 @@ public class AsyncOperationService {
 
     public String startAsyncTask() {
         final String taskId = UUID.randomUUID().toString();
-        taskStatuses.put(taskId, "IN_PROGRESS");
+        // Устанавливаем начальный статус
+        taskStatuses.put(taskId, "IN_PROGRESS (Инициализация...)");
 
         self.processHeavyTask(taskId);
 
@@ -32,16 +32,30 @@ public class AsyncOperationService {
     @Async
     public CompletableFuture<Void> processHeavyTask(final String taskId) {
         try {
-            Thread.sleep(10000);
+            // Этап 1
+            taskStatuses.put(taskId, "Шаг 1/3: Подготовка и сбор данных (33%)");
+            Thread.sleep(3000); // Имитация работы 3 секунды
+
+            // Этап 2
+            taskStatuses.put(taskId, "Шаг 2/3: Выполнение сложных вычислений (66%)");
+            Thread.sleep(4000); // Имитация работы 4 секунды
+
+            // Этап 3
+            taskStatuses.put(taskId, "Шаг 3/3: Сохранение результатов (99%)");
+            Thread.sleep(3000); // Имитация работы 3 секунды
+
+            // Финал
             taskStatuses.put(taskId, "COMPLETED");
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            taskStatuses.put(taskId, "ERROR");
+            taskStatuses.put(taskId, "ERROR: Процесс был прерван");
         }
+
         return CompletableFuture.completedFuture(null);
     }
 
     public String checkTaskStatus(final String taskId) {
-        return taskStatuses.getOrDefault(taskId, "NOT_FOUND");
+        return taskStatuses.getOrDefault(taskId, "NOT_FOUND: Задача не найдена");
     }
 }
