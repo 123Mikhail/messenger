@@ -21,7 +21,7 @@ public class AsyncOperationService {
 
     public String startAsyncTask() {
         final String taskId = UUID.randomUUID().toString();
-        // Устанавливаем начальный статус
+
         taskStatuses.put(taskId, "IN_PROGRESS (Инициализация...)");
 
         self.processHeavyTask(taskId);
@@ -32,19 +32,19 @@ public class AsyncOperationService {
     @Async
     public CompletableFuture<Void> processHeavyTask(final String taskId) {
         try {
-            // Этап 1
+
             taskStatuses.put(taskId, "Шаг 1/3: Подготовка и сбор данных (33%)");
-            Thread.sleep(10000); // Имитация работы 3 секунды
+            Thread.sleep(10000);
 
-            // Этап 2
+
             taskStatuses.put(taskId, "Шаг 2/3: Выполнение сложных вычислений (66%)");
-            Thread.sleep(10000); // Имитация работы 4 секунды
+            Thread.sleep(10000);
 
-            // Этап 3
+
             taskStatuses.put(taskId, "Шаг 3/3: Сохранение результатов (99%)");
-            Thread.sleep(10000); // Имитация работы 3 секунды
+            Thread.sleep(10000);
 
-            // Финал
+
             taskStatuses.put(taskId, "COMPLETED");
 
         } catch (InterruptedException e) {
