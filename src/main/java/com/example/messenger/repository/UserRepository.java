@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Этот метод необходим для поиска автора сообщения
     Optional<User> findByUsername(String username);
 }
