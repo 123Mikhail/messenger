@@ -34,15 +34,15 @@ public class AsyncOperationService {
         try {
             // Этап 1
             taskStatuses.put(taskId, "Шаг 1/3: Подготовка и сбор данных (33%)");
-            Thread.sleep(3000); // Имитация работы 3 секунды
+            Thread.sleep(10000); // Имитация работы 3 секунды
 
             // Этап 2
             taskStatuses.put(taskId, "Шаг 2/3: Выполнение сложных вычислений (66%)");
-            Thread.sleep(4000); // Имитация работы 4 секунды
+            Thread.sleep(10000); // Имитация работы 4 секунды
 
             // Этап 3
             taskStatuses.put(taskId, "Шаг 3/3: Сохранение результатов (99%)");
-            Thread.sleep(3000); // Имитация работы 3 секунды
+            Thread.sleep(10000); // Имитация работы 3 секунды
 
             // Финал
             taskStatuses.put(taskId, "COMPLETED");
