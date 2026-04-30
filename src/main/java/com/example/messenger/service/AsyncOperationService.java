@@ -33,7 +33,7 @@ public class AsyncOperationService {
     public CompletableFuture<Void> processHeavyTask(final String taskId) {
         try {
 
-            Thread.sleep(10000);
+            Thread.sleep(20000);
 
             taskStatuses.put(taskId, "COMPLETED");
 
