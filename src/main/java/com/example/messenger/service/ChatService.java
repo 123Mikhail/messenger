@@ -1,17 +1,13 @@
 package com.example.messenger.service;
-
 import com.example.messenger.domain.model.Chat;
 import java.util.List;
-
 public interface ChatService {
-    Chat createChat(String title, List<String> usernames, Long parentId);
+    Chat createChat(String title, List<String> usernames, Long parentId, String type);
     void addUserToChat(Long chatId, String username);
     List<Chat> getSubChats(Long parentId);
     void removeUserFromChat(Long chatId, String username);
     void deleteChat(Long chatId);
     Chat updateChatTitle(Long chatId, String newTitle);
-
-
     Chat getById(Long id);
     List<Chat> getAllChats();
 }

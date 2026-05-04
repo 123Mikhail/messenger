@@ -25,6 +25,9 @@ public class Message {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
+    @Column(name = "file_url")
+    private String fileUrl;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

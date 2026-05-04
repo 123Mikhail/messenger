@@ -14,21 +14,15 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findByUserUsername(String username);
-
     List<Message> findByChatId(Long chatId);
 
-    @Query("SELECT m FROM Message m JOIN m.chat c WHERE c.title LIKE %:chatTitle% AND m.content LIKE %:keyword%")
-    Page<Message> searchByChatAndContentJpql(
-            @Param("chatTitle") String chatTitle,
-            @Param("keyword") String keyword,
-            Pageable pageable);
+    Page<Message> findByChatId(Long chatId, Pageable pageable);
 
+    @Query("SELECT m FROM Message m JOIN m.chat c WHERE c.title LIKE %:chatTitle% AND m.content LIKE %:keyword%")
+    Page<Message> searchByChatAndContentJpql(@Param("chatTitle") String chatTitle, @Param("keyword") String keyword, Pageable pageable);
 
     @Query(value = "SELECT m.* FROM messages m INNER JOIN chats c ON m.chat_id = c.id WHERE c.title ILIKE %:chatTitle% AND m.content ILIKE %:keyword%",
             countQuery = "SELECT count(*) FROM messages m INNER JOIN chats c ON m.chat_id = c.id WHERE c.title ILIKE %:chatTitle% AND m.content ILIKE %:keyword%",
             nativeQuery = true)
-    Page<Message> searchByChatAndContentNative(
-            @Param("chatTitle") String chatTitle,
-            @Param("keyword") String keyword,
-            Pageable pageable);
+    Page<Message> searchByChatAndContentNative(@Param("chatTitle") String chatTitle, @Param("keyword") String keyword, Pageable pageable);
 }

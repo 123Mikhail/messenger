@@ -8,13 +8,14 @@ import java.util.List;
 
 public interface MessageService {
     MessageDto save(MessageDto dto);
-
     List<MessageDto> saveAll(List<MessageDto> dtos);
-
     MessageDto getById(Long id);
     List<MessageDto> getAll();
     List<MessageDto> getBySender(String sender);
     List<MessageDto> getByChatId(Long chatId);
+
+    Page<MessageDto> getMessagesByChatIdPaged(Long chatId, Pageable pageable);
+
     MessageDto updateMessage(Long id, String newContent);
     void deleteMessage(Long id);
     Page<MessageDto> searchMessagesJpql(String chatTitle, String keyword, Pageable pageable);

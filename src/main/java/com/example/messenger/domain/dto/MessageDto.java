@@ -36,4 +36,7 @@ public class MessageDto {
 
     @Schema(description = "Время отправки")
     private LocalDateTime timestamp;
+
+    @Schema(description = "Ссылка на прикрепленный файл")
+    private String fileUrl;
 }

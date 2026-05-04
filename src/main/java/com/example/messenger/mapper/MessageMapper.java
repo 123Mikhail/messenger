@@ -24,6 +24,7 @@ public class MessageMapper {
 
         dto.setContent(message.getContent());
         dto.setTimestamp(message.getTimestamp());
+        dto.setFileUrl(message.getFileUrl());
         return dto;
     }
 
@@ -35,6 +36,7 @@ public class MessageMapper {
                 .id(dto.getId())
                 .content(dto.getContent())
                 .timestamp(dto.getTimestamp())
+                .fileUrl(dto.getFileUrl())
                 .build();
     }
 }

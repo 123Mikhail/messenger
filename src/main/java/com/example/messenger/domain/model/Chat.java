@@ -1,38 +1,29 @@
 package com.example.messenger.domain.model;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "chats")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Chat {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public enum ChatType { GROUP, CHANNEL }
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false)
     private String title;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chat_type")
+    private ChatType type = ChatType.GROUP;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "chat_members",
-            joinColumns = @JoinColumn(name = "chat_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "chat_members", joinColumns = @JoinColumn(name = "chat_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> members = new ArrayList<>();
 
     @JsonIgnore
@@ -47,4 +38,7 @@ public class Chat {
     @JsonIgnore
     @OneToMany(mappedBy = "parentChat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Chat> subChats = new ArrayList<>();
+
+    @JsonProperty("parentId")
+    public Long getParentId() { return parentChat != null ? parentChat.getId() : null; }
 }
