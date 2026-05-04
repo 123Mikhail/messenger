@@ -14,7 +14,7 @@ import java.util.UUID;
 @RequestMapping("/api/files")
 public class FileController {
 
-    private final String UPLOAD_DIR = "uploads/";
+    private static final String UPLOAD_DIR = "uploads/";
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
