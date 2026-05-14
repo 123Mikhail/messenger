@@ -8,7 +8,7 @@ class MessengerApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println("Context loads")
+        System.out.println("Context loads");
     }
 
 }
