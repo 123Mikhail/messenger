@@ -1,6 +1,5 @@
 package com.example.messenger.security;
 
-import com.example.messenger.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

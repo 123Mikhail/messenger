@@ -26,8 +26,9 @@ public class MessageController {
         return ResponseEntity.ok(saved);
     }
 
+    // ИСПРАВЛЕНО: <?> заменено на <Object> для Сонара
     @GetMapping
-    public ResponseEntity<?> getMessages(
+    public ResponseEntity<Object> getMessages(
             @RequestParam(required = false) Long chatId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size) {

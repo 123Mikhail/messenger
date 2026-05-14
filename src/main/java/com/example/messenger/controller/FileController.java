@@ -1,6 +1,7 @@
 package com.example.messenger.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -24,8 +25,12 @@ public class FileController {
                 directory.mkdirs();
             }
 
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(UPLOAD_DIR + fileName);
+            String originalFilename = file.getOriginalFilename();
+            String cleanFilename = originalFilename != null ? StringUtils.cleanPath(originalFilename) : "unknown";
+            String fileName = UUID.randomUUID() + "_" + cleanFilename;
+
+
+            Path filePath = Paths.get(UPLOAD_DIR).resolve(fileName).normalize();
 
             Files.write(filePath, file.getBytes());
 
