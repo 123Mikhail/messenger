@@ -32,7 +32,8 @@ class ChatServiceImplTest {
         when(userRepository.findByUsername("User1")).thenReturn(Optional.of(new User()));
         when(chatRepository.save(any(Chat.class))).thenReturn(new Chat());
 
-        assertNotNull(chatService.createChat("Title", Collections.singletonList("User1"), null));
+        // ИСПРАВЛЕНО: добавлен 4-й аргумент "GROUP"
+        assertNotNull(chatService.createChat("Title", Collections.singletonList("User1"), null, "GROUP"));
     }
 
     @Test
@@ -41,20 +42,23 @@ class ChatServiceImplTest {
         when(chatRepository.findById(2L)).thenReturn(Optional.of(new Chat()));
         when(chatRepository.save(any(Chat.class))).thenReturn(new Chat());
 
-        assertNotNull(chatService.createChat("Title", Collections.singletonList("User1"), 2L));
+        // ИСПРАВЛЕНО: добавлен 4-й аргумент "GROUP"
+        assertNotNull(chatService.createChat("Title", Collections.singletonList("User1"), 2L, "GROUP"));
     }
 
     @Test
     void createChat_EmptyUsernamesList() {
         when(chatRepository.save(any(Chat.class))).thenReturn(new Chat());
-        assertNotNull(chatService.createChat("Title", Collections.emptyList(), null));
+        // ИСПРАВЛЕНО: добавлен 4-й аргумент "GROUP"
+        assertNotNull(chatService.createChat("Title", Collections.emptyList(), null, "GROUP"));
     }
 
     @Test
     void createChat_UserNotFound() {
         when(userRepository.findByUsername("Ghost")).thenReturn(Optional.empty());
         List<String> ghostList = List.of("Ghost");
-        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", ghostList, null));
+        // ИСПРАВЛЕНО: добавлен 4-й аргумент "GROUP"
+        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", ghostList, null, "GROUP"));
     }
 
     @Test
@@ -62,7 +66,8 @@ class ChatServiceImplTest {
         when(userRepository.findByUsername("User1")).thenReturn(Optional.of(new User()));
         when(chatRepository.findById(2L)).thenReturn(Optional.empty());
         List<String> userList = List.of("User1");
-        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", userList, 2L));
+        // ИСПРАВЛЕНО: добавлен 4-й аргумент "GROUP"
+        assertThrows(IllegalArgumentException.class, () -> chatService.createChat("Title", userList, 2L, "GROUP"));
     }
 
     @Test
