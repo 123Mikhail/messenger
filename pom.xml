@@ -102,6 +102,8 @@
     </dependencies>
 
     <build>
+        <finalName>messenger-app</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -168,9 +170,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <classifier>exec</classifier>
-                </configuration>
             </plugin>
         </plugins>
     </build>
