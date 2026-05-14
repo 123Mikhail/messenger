@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,20 +17,13 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @PostMapping
     public ResponseEntity<MessageDto> createMessage(@RequestBody MessageDto messageDto) {
-        return ResponseEntity.ok(messageService.save(messageDto));
-    }
-
-    @PostMapping("/bulk")
-    public ResponseEntity<List<MessageDto>> createMessagesBulk(@RequestBody List<MessageDto> messageDtos) {
-        return ResponseEntity.ok(messageService.saveAll(messageDtos));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<MessageDto> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(messageService.getById(id));
+        MessageDto saved = messageService.save(messageDto);
+        messagingTemplate.convertAndSend("/topic/chats/" + saved.getChatId(), saved);
+        return ResponseEntity.ok(saved);
     }
 
     @GetMapping
@@ -46,12 +40,17 @@ public class MessageController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MessageDto> updateMessage(@PathVariable Long id, @RequestParam String newContent) {
-        return ResponseEntity.ok(messageService.updateMessage(id, newContent));
+        MessageDto updated = messageService.updateMessage(id, newContent);
+        messagingTemplate.convertAndSend("/topic/chats/" + updated.getChatId(), updated);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
+        MessageDto msg = messageService.getById(id);
         messageService.deleteMessage(id);
+        msg.setContent("[DELETED]");
+        messagingTemplate.convertAndSend("/topic/chats/" + msg.getChatId(), msg);
         return ResponseEntity.noContent().build();
     }
 }
