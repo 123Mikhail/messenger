@@ -1,4 +1,4 @@
-package com.example.messenger.config;
+package com.example.messenger.security;
 
 import com.example.messenger.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
