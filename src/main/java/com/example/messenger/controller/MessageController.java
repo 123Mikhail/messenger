@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
@@ -19,10 +17,12 @@ public class MessageController {
     private final MessageService messageService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    private static final String TOPIC_CHATS = "/topic/chats/";
+
     @PostMapping
     public ResponseEntity<MessageDto> createMessage(@RequestBody MessageDto messageDto) {
         MessageDto saved = messageService.save(messageDto);
-        messagingTemplate.convertAndSend("/topic/chats/" + saved.getChatId(), saved);
+        messagingTemplate.convertAndSend(TOPIC_CHATS + saved.getChatId(), saved);
         return ResponseEntity.ok(saved);
     }
 
@@ -41,7 +41,7 @@ public class MessageController {
     @PutMapping("/{id}")
     public ResponseEntity<MessageDto> updateMessage(@PathVariable Long id, @RequestParam String newContent) {
         MessageDto updated = messageService.updateMessage(id, newContent);
-        messagingTemplate.convertAndSend("/topic/chats/" + updated.getChatId(), updated);
+        messagingTemplate.convertAndSend(TOPIC_CHATS + updated.getChatId(), updated);
         return ResponseEntity.ok(updated);
     }
 
@@ -50,7 +50,7 @@ public class MessageController {
         MessageDto msg = messageService.getById(id);
         messageService.deleteMessage(id);
         msg.setContent("[DELETED]");
-        messagingTemplate.convertAndSend("/topic/chats/" + msg.getChatId(), msg);
+        messagingTemplate.convertAndSend(TOPIC_CHATS + msg.getChatId(), msg);
         return ResponseEntity.noContent().build();
     }
 }

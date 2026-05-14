@@ -46,10 +46,17 @@ public class AuthController {
     }
 
     @Data
-    static class AuthRequest { String email; String username; String password; }
+    static class AuthRequest {
+        private String email;
+        private String username;
+        private String password;
+    }
 
     @Data
     static class AuthResponse {
-        private final String token; private final Long id; private final String username; private final String email;
+        private final String token;
+        private final Long id;
+        private final String username;
+        private final String email;
     }
 }
