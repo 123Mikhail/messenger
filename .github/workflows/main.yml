@@ -26,12 +26,11 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Build and Analyze
+     - name: Build and Analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=d48ba59516de07fedab04bd0c9d0d0a733dd0fdf -Dsonar.organization=ТВОЙ_КЛЮЧ -DskipTests
-
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=123mikhail -Dsonar.organization=123Mikhail -DskipTests
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
